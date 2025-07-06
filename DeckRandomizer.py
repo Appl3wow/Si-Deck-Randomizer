@@ -45,9 +45,9 @@ class Card:
                 state_json = json.loads(self.card["LuaScriptState"])
             except Exception as e:
                 print(f"Failed to decode LuaScriptState: {e}")
-        self.thresholds_json = state_json['thresholds'][0]      
+        self.thresholds_json = state_json
         # Convert the string (e.g., "00000023") to the Elements class
-        threshold_str = self.thresholds_json['elements']
+        threshold_str = self.thresholds_json['thresholds'][0]['elements']
         # Get the number of non-zero numbers and put their values in an array
         non_zero_values = [c for i, c in enumerate(threshold_str) if c != '0']
 
@@ -60,7 +60,7 @@ class Card:
                 setattr(self.threshold, element, int(val))
             else:
                 break
-        self.thresholds_json['elements'] = self.threshold.encode_elements()
+        self.thresholds_json['thresholds'][0]['elements'] = self.threshold.encode_elements()
 
     def modify_card_metadata(self):
         encoded_elements = self.elements.encode_elements()
@@ -145,7 +145,8 @@ def gen_card_image(card: Card) -> None:
 
     # Draw the threshold elements
     if hasattr(card, 'threshold') and card.threshold:
-        start_x, start_y = 360 - (360 * card.thresholds_json['position']['x']) + 60, 430 + 420 * card.thresholds_json['position']['z']
+        print(card.thresholds_json)
+        start_x, start_y = 360 - (360 * card.thresholds_json['thresholds'][0]['position']['x']) + 60, 430 + 420 * card.thresholds_json['thresholds'][0]['position']['z']
         cur_x, cur_y = int(start_x), int(start_y)
         thresh_element_images = {
             "sun": "Assets/thresh_Esun.png",
@@ -175,7 +176,7 @@ def gen_card_image(card: Card) -> None:
 
 
     # Optionally save or display the result
-    image.save(f"V1/{card.card.get('Nickname', 'card')} Randomized.png")
+    image.save(f"V2/{card.card.get('Nickname', 'card')} Randomized.png")
     return
 
 def run(file_name:str = "Minor Powers.json"):
@@ -185,7 +186,7 @@ def run(file_name:str = "Minor Powers.json"):
             print(f"Processing card: {card_json['Nickname']}")
             card = Card(card_json)
             gen_card_image(card)
-            img_link = f"https://raw.githubusercontent.com/Appl3wow/Si-Deck-Randomizer/refs/heads/main/V1/{card_json['Nickname']} Randomized.png"
+            img_link = f"https://raw.githubusercontent.com/Appl3wow/Si-Deck-Randomizer/refs/heads/main/V2/{card_json['Nickname']} Randomized.png"
             card.add_image_link(img_link)
             card_json = card.card
 
@@ -201,7 +202,7 @@ def run(file_name:str = "Minor Powers.json"):
     data["ObjectStates"][0]["ContainedObjects"] = card_metadata
 
     # Overwrite the previous file if it exists by opening in write mode ('w')
-    with open(f"V1/Randomized {file_name}", "w", encoding="utf-8") as f:
+    with open(f"V2/Randomized {file_name}", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
