@@ -161,6 +161,11 @@ def gen_card_image(card: Card) -> None:
             "3": "Assets/3.png",
             "4": "Assets/4.png",
         }
+
+        # Draw the threshold background
+        thresh_bg = Image.new("RGBA", (540, 60), "#FAE7C6")
+        image.alpha_composite(thresh_bg, dest=(165, cur_y-20))
+
         # Draw threshold elements for each element type
         for element in ["sun", "moon", "fire", "air", "water", "earth", "plant", "animal"]:
             value = getattr(card.threshold, element, 0)
@@ -176,7 +181,7 @@ def gen_card_image(card: Card) -> None:
 
 
     # Optionally save or display the result
-    image.save(f"V2/{card.card.get('Nickname', 'card')} Randomized.png")
+    image.save(f"V3/{card.card.get('Nickname', 'card')} Randomized.png")
     return
 
 def run(file_name:str = "Minor Powers.json"):
@@ -186,7 +191,7 @@ def run(file_name:str = "Minor Powers.json"):
             print(f"Processing card: {card_json['Nickname']}")
             card = Card(card_json)
             gen_card_image(card)
-            img_link = f"https://raw.githubusercontent.com/Appl3wow/Si-Deck-Randomizer/refs/heads/main/V2/{card_json['Nickname']} Randomized.png"
+            img_link = f"https://raw.githubusercontent.com/Appl3wow/Si-Deck-Randomizer/refs/heads/main/V3/{card_json['Nickname']} Randomized.png"
             card.add_image_link(img_link)
             card_json = card.card
 
@@ -202,7 +207,7 @@ def run(file_name:str = "Minor Powers.json"):
     data["ObjectStates"][0]["ContainedObjects"] = card_metadata
 
     # Overwrite the previous file if it exists by opening in write mode ('w')
-    with open(f"V2/Randomized {file_name}", "w", encoding="utf-8") as f:
+    with open(f"V3/Randomized {file_name}", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
