@@ -66,7 +66,7 @@ class Card:
         # Replace any elements="XXXXXXXX" (where X is 0 or 1, 8 digits) with the new encoded_elements value in card["LuaScript"]
         if "LuaScript" in self.card:
             self.card["LuaScript"] = re.sub(r'elements="\d{8}"', f'elements="{encoded_elements}"', self.card["LuaScript"])
-        if self.thresholds_json:
+        if hasattr(self, 'thresholds_json') and self.thresholds_json:
             self.card["LuaScriptState"] = json.dumps(self.thresholds_json)
 
     def add_image_link(self, image_link: str) -> None:
@@ -143,7 +143,7 @@ def gen_card_image(card: Card) -> None:
             image.alpha_composite(element_img, dest=(pos_x + offset_x, pos_y + offset_y))
 
     # Draw the threshold elements
-    if card.threshold:
+    if hasattr(card, 'threshold') and card.threshold:
         start_x, start_y = 360 - (360 * card.thresholds_json['position']['x']) + 60, 430 + 420 * card.thresholds_json['position']['z']
         cur_x, cur_y = int(start_x), int(start_y)
         thresh_element_images = {
@@ -179,12 +179,12 @@ def gen_card_image(card: Card) -> None:
 
 def run(file_name:str = "Minor Powers.json"):
     card_metadata = extract_json(file_name)
-    for card_json in card_metadata[:10]:
+    for card_json in card_metadata:
         if isinstance(card_json, dict) and "LuaScript" in card_json:
             print(f"Processing card: {card_json['Nickname']}")
             card = Card(card_json)
             gen_card_image(card)
-            card.add_image_link(f"https://raw.githubusercontent.com/Appl3wow/Si-Deck-Randomizer/refs/heads/main/Assets/.png")
+            card.add_image_link(f"https://raw.githubusercontent.com/Appl3wow/Si-Deck-Randomizer/refs/heads/main/V0/{card_json['Nickname']} Randomized.png")
             card_json = card.card
         else:
             print("Skipping non-card object or missing LuaScript.")
@@ -198,4 +198,4 @@ def run(file_name:str = "Minor Powers.json"):
 
 if __name__ == "__main__":
     run("Major Powers.json")
-    # run("Minor Powers.json")
+    run("Minor Powers.json")
