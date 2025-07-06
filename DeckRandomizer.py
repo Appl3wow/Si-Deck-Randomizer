@@ -184,7 +184,7 @@ def run(file_name:str = "Minor Powers.json"):
             print(f"Processing card: {card_json['Nickname']}")
             card = Card(card_json)
             gen_card_image(card)
-            card.add_image_link("https://i.imgur.com/j4ymxwK.jpeg")
+            card.add_image_link(f"https://raw.githubusercontent.com/Appl3wow/Si-Deck-Randomizer/refs/heads/main/Assets/.png")
             card_json = card.card
         else:
             print("Skipping non-card object or missing LuaScript.")
