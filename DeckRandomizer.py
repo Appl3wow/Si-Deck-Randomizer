@@ -51,7 +51,18 @@ class Card:
         # Get the number of non-zero numbers and put their values in an array
         non_zero_values = [c for i, c in enumerate(threshold_str) if c != '0']
 
-        nonzero_element_names = [name for name, v in vars(self.elements).items() if v != 0]
+        # Find the value of energy=X in LuaScript
+        energy_value = 4
+        if "LuaScript" in self.card:
+            match = re.search(r'energy=(\d+)', self.card["LuaScript"])
+            if match:
+                energy_value = int(match.group(1))
+        nonzero_element_names = []
+        if energy_value > 1:
+            nonzero_element_names = [name for name, v in vars(self.elements).items() if v != 0]
+        else:
+            nonzero_element_names = [name for name, v in vars(self.elements).items() if v == 0]
+
         random.shuffle(nonzero_element_names)
         self.threshold = Elements()
         for val in non_zero_values:
@@ -181,7 +192,7 @@ def gen_card_image(card: Card) -> None:
 
 
     # Optionally save or display the result
-    image.save(f"V4/{card.card.get('Nickname', 'card')} Randomized.png")
+    image.save(f"V5/{card.card.get('Nickname', 'card')} Randomized.png")
     return
 
 def run(file_name:str = "Minor Powers.json"):
@@ -191,7 +202,7 @@ def run(file_name:str = "Minor Powers.json"):
             print(f"Processing card: {card_json['Nickname']}")
             card = Card(card_json)
             gen_card_image(card)
-            img_link = f"https://raw.githubusercontent.com/Appl3wow/Si-Deck-Randomizer/refs/heads/main/V4/{card_json['Nickname']} Randomized.png"
+            img_link = f"https://raw.githubusercontent.com/Appl3wow/Si-Deck-Randomizer/refs/heads/main/V5/{card_json['Nickname']} Randomized.png"
             card.add_image_link(img_link)
             card_json = card.card
 
@@ -207,7 +218,7 @@ def run(file_name:str = "Minor Powers.json"):
     data["ObjectStates"][0]["ContainedObjects"] = card_metadata
 
     # Overwrite the previous file if it exists by opening in write mode ('w')
-    with open(f"V4/Randomized {file_name}", "w", encoding="utf-8") as f:
+    with open(f"V5/Randomized {file_name}", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
