@@ -8,14 +8,15 @@ import requests
 from os import path
 from imgur_python import Imgur
 
-def extract_json(filename:str) -> Dict[str, Any]:
+def extract_json(filename:str) -> tuple[Dict[str, Any], list[Any]]:
     data: Dict[str, Any] = {}
     with open(filename, "r", encoding="utf-8") as f:
         data = json.load(f)
+    all_metadata: Dict[str, Any] = data
     card_metadata: list[Any] = data["ObjectStates"][0]["ContainedObjects"]
 
     print(f"first_card: {card_metadata[0]}, image_data: {card_metadata[0]["CustomDeck"]}")
-    return card_metadata
+    return data, card_metadata
 
 class Card:
     def __init__(self, card: Dict[str, Any]):
@@ -178,22 +179,30 @@ def gen_card_image(card: Card) -> None:
     return
 
 def run(file_name:str = "Minor Powers.json"):
-    card_metadata = extract_json(file_name)
+    data, card_metadata = extract_json(file_name)
     for card_json in card_metadata:
         if isinstance(card_json, dict) and "LuaScript" in card_json:
             print(f"Processing card: {card_json['Nickname']}")
             card = Card(card_json)
             gen_card_image(card)
-            card.add_image_link(f"https://raw.githubusercontent.com/Appl3wow/Si-Deck-Randomizer/refs/heads/main/V0/{card_json['Nickname']} Randomized.png")
+            img_link = f"https://raw.githubusercontent.com/Appl3wow/Si-Deck-Randomizer/refs/heads/main/V0/{card_json['Nickname']} Randomized.png"
+            card.add_image_link(img_link)
             card_json = card.card
+
+            card_id = int(card_json.get("CardID", "") / 100)
+            print(card_id)
+            data['ObjectStates'][0]['CustomDeck'][str(card_id)]['FaceURL'] = img_link
         else:
             print("Skipping non-card object or missing LuaScript.")
 
     print("All cards processed.")
     print(card_metadata[0])  # Print the first card metadata for verification
+
+    data["ObjectStates"][0]["ContainedObjects"] = card_metadata
+
     # Overwrite the previous file if it exists by opening in write mode ('w')
-    with open(f"out/{file_name} Randomized.json", "w", encoding="utf-8") as f:
-        json.dump(card_metadata, f, ensure_ascii=False, indent=2)
+    with open(f"out/Randomized {file_name}", "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
 
 
 if __name__ == "__main__":
