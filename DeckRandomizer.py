@@ -192,7 +192,7 @@ def gen_card_image(card: Card) -> None:
 
 
     # Optionally save or display the result
-    image.save(f"V5/{card.card.get('Nickname', 'card')} Randomized.png")
+    image.save(f"V6/{card.card.get('Nickname', 'card')} Randomized.png")
     return
 
 def run(file_name:str = "Minor Powers.json"):
@@ -202,7 +202,7 @@ def run(file_name:str = "Minor Powers.json"):
             print(f"Processing card: {card_json['Nickname']}")
             card = Card(card_json)
             gen_card_image(card)
-            img_link = f"https://raw.githubusercontent.com/Appl3wow/Si-Deck-Randomizer/refs/heads/main/V5/{card_json['Nickname']} Randomized.png"
+            img_link = f"https://raw.githubusercontent.com/Appl3wow/Si-Deck-Randomizer/refs/heads/main/V6/{card_json['Nickname']} Randomized.png"
             card.add_image_link(img_link)
             card_json = card.card
 
@@ -218,7 +218,7 @@ def run(file_name:str = "Minor Powers.json"):
     data["ObjectStates"][0]["ContainedObjects"] = card_metadata
 
     # Overwrite the previous file if it exists by opening in write mode ('w')
-    with open(f"V5/Randomized {file_name}", "w", encoding="utf-8") as f:
+    with open(f"V6/Randomized {file_name}", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
